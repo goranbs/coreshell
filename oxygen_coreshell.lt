@@ -1,0 +1,86 @@
+#######################################################################
+# file "oxygen_coreshell.lt"
+# calcite super cell. Core-shell model, using Buckingham potential
+#
+
+CaCO3 {
+	write_once("In Init") {
+		units real
+		atom_style full
+		pair_style buck/coul/long/cs 10.0
+		bond_style harmonic
+####		angle_style harmonic
+		kspace_style pppm 0.0001
+		pair_modify tail yes	
+	}
+
+	## Atom properties and molecular topology
+	# "atom_style full" means we use this column format:
+	#           atomID molID atomType charge coordX coordY coordZ
+	write("Data Atoms") { 
+		$atom:Ca1 $mol:1 @atom:Ca              2.000000        0.00000        0.00000        0.00000
+		$atom:O1 $mol:3 @atom:O                1.018487        1.28642       -0.00000        4.26538
+		$atom:Oshell1 $mol:3 @atom:Oshell     -2.133000        1.28642       -0.00000        4.26538
+		$atom:O2 $mol:4 @atom:O                1.018487       -0.64321        1.11407        4.26538
+		$atom:Oshell2 $mol:4 @atom:Oshell     -2.133000       -0.64321        1.11407        4.26538
+		$atom:O3 $mol:5 @atom:O                1.018487        1.85179        3.20739        4.26538
+		$atom:Oshell3 $mol:5 @atom:Oshell     -2.133000        1.85179        3.20739        4.26538
+
+	}
+	# molID number is unique for each molecule
+	write_once("Data Masses") {
+		# atomType mass
+		# core-mass ratio: 0.1
+		@atom:Ca 40.078	
+####		@atom:C 12.0107
+		@atom:O 14.39946
+		@atom:Oshell 1.59994
+	}
+	write("Data Bonds") {
+		$bond:OOshell1 @bond:OOshell $atom:O1 $atom:Oshell1
+		$bond:OOshell2 @bond:OOshell $atom:O2 $atom:Oshell2
+		$bond:OOshell3 @bond:OOshell $atom:O3 $atom:Oshell3
+	}
+####	write("Data Angles") {
+####		$angle:OCO1 @angle:OCO $atom:O1 $atom:C1 $atom:O2
+####		$angle:OCO2 @angle:OCO $atom:O1 $atom:C1 $atom:O3
+####	}
+	## Core-shell information, what atoms are split into a core and a shell
+	# atomID CS-ID
+	write("Data CS-Info") {
+		$atom:O1 $mol:1
+		$atom:Oshell1 $mol:1
+		$atom:O2 $mol:2
+		$atom:Oshell2 $mol:2
+		$atom:O3 $mol:3
+		$atom:Oshell3 $mol:3
+	}
+	# --- Force-field parameters:
+	write_once("In Settings") {
+		# Hybrid Buckingham/LJ - Bruneval et.al. J. Phys. Chem. B, Vol. 111, No. 42, 2007
+		# -- Non-bonded (Pair) interactions --
+		# Buckingham: pair_coeff atom1 atom2 hybridversion A[Kcal/mol] rho[1/A^6] C[KcalA^6/mol]
+                pair_coeff @atom:Ca @atom:Ca  19823.81931 2.198 13309.441
+####		pair_coeff @atom:C @atom:C  88389.7467 3.6019 581.4312
+		pair_coeff @atom:O @atom:O  55026.3145 3.9602 268.537
+		pair_coeff @atom:Ca @atom:O  33027.7416 2.9503 1890.5230
+####		pair_coeff @atom:Ca @atom:C  41859.5553 2.8137 2781.821
+####		pair_coeff @atom:C @atom:O  69740.6768 3.7768 395.1402
+
+		pair_coeff @atom:Oshell @atom:Oshell 1481465.805 0.198913 503.724562	
+		pair_coeff @atom:Ca @atom:Oshell 49673.791 0.289118 0.0
+####		pair_coeff @atom:C @atom:Oshell 2304.2385 0.195838 0.0
+		pair_coeff @atom:O @atom:Oshell 0.0 1.0 0.0                           # should be no interaction
+
+		# -- Bonded interactions --
+		bond_coeff @bond:OOshell 1216.214988 0.0
+####		special_bonds coul 0.0 1.0 1.0                                        # cancel coulomb interaction core-shell?
+				
+####		angle_coeff @angle:OCO 92 120
+		
+		# -- Groups:
+####		group caco3 type @atom:Ca @atom:C @atom:O @atom:Oshell
+		group coreandshells type @atom:O @atom:Oshell
+	}
+
+} # End CaCO3

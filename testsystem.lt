@@ -1,0 +1,22 @@
+#######################################################################
+# Calcium carbonate CaCO3
+#
+#######################################################################
+
+
+import "oxygen_coreshell.lt" # Use buckingham potential
+
+Matrix {
+	box = new CaCO3 [1].move(4.9900,0.0,0.0)
+		        [1].move(0.0,4.9900,0.0)
+		        [1].move(0.0,0.0,17.0615)
+}
+
+
+crystal = new Matrix.move(0,0,0)
+
+write_once("Data Boundary"){
+	0.0 24.95 xlo xhi
+	0.0 24.95 ylo yhi
+	0.0 17.0615 zlo zhi 
+}
